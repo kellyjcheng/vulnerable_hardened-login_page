@@ -1,16 +1,16 @@
 # vulnerable_hardened-login_page
 
-A security-focused educational project demonstrating the contrast between a deliberately vulnerable and a properly hardened login system — built with Python, Flask, and SQLite.
+A side-by-side comparison of a broken authentication system versus a secure one, built with Python, Flask, and SQLite. 
 
-This project is not a demonstration of *what to build*. It's a demonstration of *what happens when you don't build it right*, and how to fix it.
+This project isn't a blueprint for how to build a login page — it's a breakdown of common security mistakes, why they break in the real world, and how to write code that actually holds up.
 
 ---
 
-## Purpose
+## What This Is
 
-Every vulnerability in Version 1 is real. These are not contrived edge cases — they are the exact classes of bug that appear in production systems and in CVEs every year. Version 2 is the corrective, applying defence-in-depth principles to address each attack surface systematically.
+Version 1 is packed with real bugs — the kind that show up constantly in actual web apps and leak real credentials. Version 2 cleans up those flaws with practical fixes you'd actually use in production.
 
-The codebase is annotated throughout with `# VULN:` and `# FIX:` comments so that each line of code can be read as a security decision, not just an implementation detail.
+Every security decision in the codebase is tagged with `# VULN:` or `# FIX:` comments so you can follow along directly in the code.
 
 ---
 
@@ -21,9 +21,9 @@ vulnerable_hardened-login_page/
 │
 ├── README.md                   ← You are here
 │
-├── v1_vulnerable/              ← Deliberately insecure implementation
-│   ├── app.py                  ← Flask application (annotated with VULN comments)
-│   ├── init_db.py              ← Database initialisation script
+├── v1_vulnerable/              ← Insecure implementation
+│   ├── app.py                  ← Flask app (tagged with # VULN)
+│   ├── init_db.py              ← DB setup
 │   ├── requirements.txt        ← Minimal dependencies
 │   ├── templates/
 │   │   ├── login.html
@@ -32,9 +32,9 @@ vulnerable_hardened-login_page/
 │   └── static/
 │       └── style.css
 │
-├── v2_hardened/                ← Hardened implementation
-│   ├── app.py                  ← Flask application (annotated with FIX comments)
-│   ├── init_db.py              ← Database initialisation script
+├── v2_hardened/                ← Patched implementation
+│   ├── app.py                  ← Flask app (tagged with # FIX)
+│   ├── init_db.py              ← DB setup
 │   ├── requirements.txt        ← Includes bcrypt, flask-limiter, flask-session
 │   ├── templates/
 │   │   ├── login.html
@@ -44,134 +44,132 @@ vulnerable_hardened-login_page/
 │       └── style.css
 │
 └── docs/
-    └── attack_surface_map.md   ← Per-vulnerability breakdown with exploit examples
+    └── attack_surface_map.md   ← Exploit breakdown and walkthroughs
 ```
 
 ---
 
-## Versions at a Glance
+## Quick Comparison
 
 ### Version 1 — Vulnerable
 
-| Attack Surface | Implementation | Risk |
+| Feature | Implementation | Impact |
 |---|---|---|
-| Password storage | Plaintext in database | Full credential exposure on DB breach |
-| Query construction | String concatenation | SQL injection — auth bypass, data dump |
-| Login attempts | Unlimited | Brute force / credential stuffing |
-| Session handling | Weak, unsigned token | Session fixation / hijacking |
+| Passwords | Stored in plain text | A single database breach leaks every user password |
+| Database Queries | Raw string concatenation | SQL injection allows auth bypass and full database dumps |
+| Login Security | Unlimited password attempts | Open to simple brute-force attacks |
+| Sessions | Unsigned, predictable tokens | Easy to hijack or trick users into fixed sessions |
 
 ### Version 2 — Hardened
 
-| Attack Surface | Implementation | Defence |
+| Feature | Implementation | Fix |
 |---|---|---|
-| Password storage | bcrypt with per-user salt | Rainbow tables and DB dumps are useless |
-| Query construction | Parameterised queries | SQL injection structurally impossible |
-| Login attempts | Rate limiting + account lockout | Brute force made computationally infeasible |
-| Session handling | HttpOnly + Secure flags, cryptographic token | Token theft mitigated; MITM and XSS hardened |
+| Passwords | `bcrypt` with individual salts | Hashes can't be reversed or looked up in pre-computed tables |
+| Database Queries | Parameterized queries | User input is safely handled so SQL injection won't work |
+| Login Security | Rate limiting + lockout rules | Slows down automated login spam to a crawl |
+| Sessions | `HttpOnly` + `Secure` signed cookies | Blocks JavaScript access and stops token interception |
 
 ---
 
-## Key Vulnerabilities Demonstrated
+## The Flaws & The Fixes
 
 ### 1. SQL Injection (v1)
-The login query in v1 is built by concatenating user input directly into the SQL string. An attacker supplying `' OR '1'='1` as a username can bypass authentication entirely without knowing any valid credentials. The same technique can be extended to dump the entire user table.
+In v1, user input gets stuck directly inside the SQL string. Entering `' OR '1'='1` as the username lets anyone log in without a password or dump the entire user database.
 
-**v1 query:**
+**v1 code:**
 ```python
 query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'"
 ```
 
-**Payload that bypasses auth:**
+**Bypass payload:**
 ```
 username: ' OR '1'='1' --
 password: anything
 ```
 
-**v2 fix:** Parameterised queries — the database driver handles escaping; user input is *never* interpreted as SQL syntax.
+**v2 fix:** Parameterized queries. The database handles user input safely as raw data, not executable code.
 
 ---
 
-### 2. Plaintext Password Storage (v1)
-Passwords in v1 are stored exactly as the user typed them. A single SQL injection, a misconfigured backup, or a database file left in a public S3 bucket exposes every user's password immediately — including reused passwords for other services.
+### 2. Plain Text Passwords (v1)
+v1 stores passwords raw. If the database leaks through a bad backup, open bucket, or SQL injection, every password is right there in the clear.
 
-**v2 fix:** bcrypt hashes with a per-user salt. bcrypt is intentionally slow (configurable cost factor). Even with the hash, an attacker cannot reverse it to the plaintext without a full brute-force at ~cost per guess.
-
----
-
-### 3. No Rate Limiting (v1)
-v1 accepts unlimited login attempts with no delay, lockout, or alerting. An attacker can submit thousands of password guesses per second programmatically.
-
-**v2 fix:** `flask-limiter` enforces a request cap per IP. After N consecutive failures, the account is locked for a configurable window. This makes automated credential stuffing and dictionary attacks impractical.
+**v2 fix:** `bcrypt` hashing with unique salts. `bcrypt` adds an artificial delay to password checks, making bulk offline guessing painful and slow.
 
 ---
 
-### 4. Insecure Session Handling (v1)
-v1 issues a session token that is predictable and transmitted without security flags. It can be intercepted over HTTP, stolen by client-side JavaScript (XSS), or fixed by an attacker before login.
+### 3. Missing Rate Limits (v1)
+v1 lets anyone guess passwords as fast as their internet connection allows.
 
-**v2 fix:** Sessions are cryptographically signed using Flask's SECRET_KEY via itsdangerous. Cookies are issued with HttpOnly (blocks JS access) and Secure (HTTPS only) flags. The session token is non-deterministic and expires on logout.
+**v2 fix:** `flask-limiter` sets a hard cap on attempts per IP address and temporarily locks accounts after too many failed tries.
+
+---
+
+### 4. Weak Session Cookies (v1)
+v1 uses simple session tokens without security flags. They can be stolen via script injection (XSS), sniffed over plain HTTP, or set by an attacker before the user even logs in.
+
+**v2 fix:** Cryptographically signed session tokens using Flask's `SECRET_KEY`. Cookies use `HttpOnly` (stops JavaScript from reading them) and `Secure` (requires HTTPS).
 
 ---
 
 ## How to Run
 
-### Prerequisites
+### Requirements
 - Python 3.9+
-- pip
+- `pip`
 
-### Version 1
+### Running Version 1
 
 ```bash
 cd v1_vulnerable
 pip install -r requirements.txt
 python init_db.py
 python app.py
-# → http://127.0.0.1:5000
+# Open http://127.0.0.1:5000
 ```
 
-### Version 2
+### Running Version 2
 
 ```bash
 cd v2_hardened
 pip install -r requirements.txt
 python init_db.py
 python app.py
-# → http://127.0.0.1:5000
+# Open http://127.0.0.1:5000
 ```
 
-> **Note:** Run only one version at a time, or change the port in app.py (app.run(port=5001)).
+> **Note:** Run one version at a time, or change the port inside `app.py` (`app.run(port=5001)`).
 
 ---
 
-## Annotated Comment Convention
+## Code Annotations
 
-All security-relevant decisions in the source code are marked with a two-part comment:
+All security choices in the code are tagged with comments:
 
 ```python
-# VULN: [attack class] — [why this is dangerous]
-# FIX:  [defence applied] — [why this mitigates it]
+# VULN: [issue] — [why it breaks]
+# FIX:  [solution] — [how it fixes it]
 ```
-
-These comments are intentional. The goal is for this codebase to function as a readable security reference, not just a working application.
 
 ---
 
-## Concepts Covered (OWASP Alignment)
+## OWASP Top 10 Mapping
 
-| OWASP Top 10 Category | Covered In |
+| OWASP Category | Where it shows up in v1 |
 |---|---|
-| A01 — Broken Access Control | Session fixation, dashboard access without auth (v1) |
-| A02 — Cryptographic Failures | Plaintext password storage (v1) |
-| A03 — Injection | SQL injection via string concatenation (v1) |
-| A07 — Identification and Authentication Failures | No rate limiting, weak sessions (v1) |
+| A01 — Broken Access Control | Unauthenticated dashboard access & session fixation |
+| A02 — Cryptographic Failures | Storing passwords in plain text |
+| A03 — Injection | SQL injection via string concatenation |
+| A07 — Identification & Authentication Failures | No brute-force protection & weak cookies |
 
 ---
 
 ## Disclaimer
 
-This project is for **educational purposes only**. The vulnerable version (v1_vulnerable) contains intentional security flaws. Do not deploy it to a public-facing server or use it as the basis for any production system.
+This repo is strictly for **learning and testing**. Version 1 is broken on purpose — don't host it online or reuse the vulnerable code in real projects.
 
 ---
 
 ## Author
 
-Kelly — cybersecurity student, CTF competitor, and aspiring network security engineer.
+Kelly — CS Student at UW, focus in Cybersecurity, aspiring penetration tester with specialization in AI security.
