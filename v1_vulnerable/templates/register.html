@@ -1,0 +1,11 @@
+<!--
+  register.html — Version 1 (Vulnerable)
+
+  Build:
+  - Form, method="POST", action to the /register route.
+  - Inputs: name="username", name="password".
+  - No client- or server-side password strength requirements.
+    # VULN: no password policy — "1", "a", "" are all accepted.
+  - Submit button, link back to /login.
+  - Link static/style.css.
+-->

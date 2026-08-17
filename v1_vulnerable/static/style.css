@@ -1,0 +1,12 @@
+/*
+  style.css — Version 1 (Vulnerable)
+
+  Build:
+  - Basic styling for the login/register/dashboard forms — center a
+    card on the page, style inputs and the submit button, style an
+    error-message element.
+  - Keep it simple; this file has no security relevance. Optionally
+    copy/share it with v2_hardened/static/style.css so the two apps
+    look identical and the *only* differences a user can find are
+    behavioral, not visual.
+*/

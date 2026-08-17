@@ -1,0 +1,13 @@
+<!--
+  login.html — Version 2 (Hardened)
+
+  Build: same layout as v1_vulnerable/templates/login.html, plus:
+  - A CSRF token hidden field, e.g. {{ csrf_token() }} if you add
+    Flask-WTF, or a manually generated/verified token stored in the
+    session.
+    # FIX: CSRF protection — the form can no longer be submitted
+    # cross-site using the victim's cookies without a valid token.
+  - A generic error-message area (see app.py note on not leaking
+    whether it was the username or password that was wrong).
+  - Link static/style.css (can be identical to v1's).
+-->

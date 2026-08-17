@@ -1,0 +1,17 @@
+<!--
+  login.html — Version 1 (Vulnerable)
+
+  Build:
+  - Basic HTML form, method="POST", action to the login route ("/").
+  - Two inputs: name="username" (text), name="password" (type="password").
+  - Submit button.
+  - A spot to display an error message if login failed — think about
+    whether you show a generic message or something that leaks info
+    (e.g. "wrong password" vs "no such user"), and why that matters.
+  - Link to /register for new accounts.
+  - Link static/style.css.
+
+  # VULN: no CSRF token anywhere on this form — combined with the weak
+  # session cookie in app.py, this form is vulnerable to cross-site
+  # request forgery too.
+-->

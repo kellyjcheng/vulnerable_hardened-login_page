@@ -1,0 +1,10 @@
+<!--
+  register.html — Version 2 (Hardened)
+
+  Build: same layout as v1_vulnerable/templates/register.html, plus:
+  - CSRF token field (matching login.html's approach).
+  - Client-side hints for password requirements (length/complexity),
+    mirrored by server-side validation in app.py — never trust the
+    client-side check alone.
+  - Link static/style.css.
+-->

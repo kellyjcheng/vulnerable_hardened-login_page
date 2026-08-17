@@ -1,0 +1,7 @@
+/*
+  style.css — Version 2 (Hardened)
+
+  Build: identical or near-identical to v1_vulnerable/static/style.css.
+  Keeping the two apps visually indistinguishable makes it clear the
+  security differences are entirely server-side behavior, not UI.
+*/

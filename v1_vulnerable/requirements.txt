@@ -1,0 +1,4 @@
+# Minimal dependencies — intentionally bare-bones for v1.
+# No password hashing library, no rate limiter, no session security add-ons.
+
+# flask
