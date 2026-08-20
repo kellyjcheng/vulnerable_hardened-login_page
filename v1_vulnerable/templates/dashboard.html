@@ -1,11 +1,16 @@
-<!--
-  dashboard.html — Version 1 (Vulnerable)
-
-  Build:
-  - Simple "Welcome, {{ username }}" style page rendered after login.
-  - Logout link/button pointing at /logout.
-  - Nothing here needs to be insecure by itself — the vulnerability is
-    that app.py may let unauthenticated users reach this page directly.
-    Try hitting /dashboard in a private browser window without logging
-    in first, and see what happens once app.py is written.
--->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>Welcome, {{ username }}</h1>
+        <!-- This page itself has no vulnerable code — access control (or the
+             lack of it) is enforced in app.py's /dashboard route, not here. -->
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</body>
+</html>

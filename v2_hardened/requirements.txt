@@ -1,14 +1,4 @@
-# Requirements — Version 2 (Hardened)
-#
-# Add the packages that back each # FIX in app.py:
-#   flask            — web framework (same as v1)
-#   bcrypt            # FIX: adaptive password hashing with per-password salts
-#   flask-limiter     # FIX: per-IP / per-route rate limiting for login attempts
-#   flask-session     # FIX: server-side session storage, signed + configurable
-#                        HttpOnly/Secure/SameSite cookie flags
-#
-# Pin versions once you've installed and tested them, e.g.:
-# flask==...
-# bcrypt==...
-# flask-limiter==...
-# flask-session==...
+flask
+bcrypt
+flask-limiter
+flask-session

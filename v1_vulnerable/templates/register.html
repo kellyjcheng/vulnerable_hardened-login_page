@@ -1,11 +1,31 @@
-<!--
-  register.html — Version 1 (Vulnerable)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>Register</h1>
 
-  Build:
-  - Form, method="POST", action to the /register route.
-  - Inputs: name="username", name="password".
-  - No client- or server-side password strength requirements.
-    # VULN: no password policy — "1", "a", "" are all accepted.
-  - Submit button, link back to /login.
-  - Link static/style.css.
--->
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <!-- VULN: no password policy enforced client- or server-side —
+             "", "1", "a" are all accepted by app.py. -->
+        <form method="POST" action="{{ url_for('register') }}">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p class="links"><a href="{{ url_for('login') }}">Back to login</a></p>
+    </div>
+</body>
+</html>

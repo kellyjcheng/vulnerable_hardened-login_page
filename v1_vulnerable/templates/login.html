@@ -1,17 +1,32 @@
-<!--
-  login.html — Version 1 (Vulnerable)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>Login</h1>
 
-  Build:
-  - Basic HTML form, method="POST", action to the login route ("/").
-  - Two inputs: name="username" (text), name="password" (type="password").
-  - Submit button.
-  - A spot to display an error message if login failed — think about
-    whether you show a generic message or something that leaks info
-    (e.g. "wrong password" vs "no such user"), and why that matters.
-  - Link to /register for new accounts.
-  - Link static/style.css.
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
 
-  # VULN: no CSRF token anywhere on this form — combined with the weak
-  # session cookie in app.py, this form is vulnerable to cross-site
-  # request forgery too.
--->
+        <!-- VULN: no CSRF token on this form — combined with the weak
+             session cookie in app.py, this is also vulnerable to
+             cross-site request forgery. -->
+        <form method="POST" action="{{ url_for('login') }}">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Log In</button>
+        </form>
+
+        <p class="links"><a href="{{ url_for('register') }}">Create an account</a></p>
+    </div>
+</body>
+</html>

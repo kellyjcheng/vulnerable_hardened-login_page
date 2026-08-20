@@ -1,12 +1,94 @@
-/*
-  style.css — Version 1 (Vulnerable)
+* {
+    box-sizing: border-box;
+}
 
-  Build:
-  - Basic styling for the login/register/dashboard forms — center a
-    card on the page, style inputs and the submit button, style an
-    error-message element.
-  - Keep it simple; this file has no security relevance. Optionally
-    copy/share it with v2_hardened/static/style.css so the two apps
-    look identical and the *only* differences a user can find are
-    behavioral, not visual.
-*/
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f5f7;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.card {
+    width: 100%;
+    max-width: 360px;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.card h1 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    color: #1a1a1a;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: left;
+}
+
+label {
+    font-size: 0.85rem;
+    color: #444;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #4a6cf7;
+}
+
+button {
+    margin-top: 0.5rem;
+    padding: 0.65rem;
+    border: none;
+    border-radius: 4px;
+    background: #4a6cf7;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #3955d1;
+}
+
+.error {
+    margin: 0 0 1rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 4px;
+    background: #fdecea;
+    color: #b3261e;
+    font-size: 0.9rem;
+}
+
+.links {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+}
+
+.links a {
+    color: #4a6cf7;
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}

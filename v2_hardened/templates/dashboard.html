@@ -1,8 +1,17 @@
-<!--
-  dashboard.html — Version 2 (Hardened)
-
-  Build: same "Welcome, {{ username }}" content as
-  v1_vulnerable/templates/dashboard.html, with a logout link/button
-  pointing at /logout. This page itself needs no special markup — the
-  fix lives in app.py's access-control check before rendering it.
--->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>Welcome, {{ username }}</h1>
+        <!-- This page itself needs no special markup — the fix lives in
+             app.py's /dashboard route, which checks the session before
+             rendering this template at all. -->
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</body>
+</html>

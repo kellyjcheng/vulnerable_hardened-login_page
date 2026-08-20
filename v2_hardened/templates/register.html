@@ -1,10 +1,35 @@
-<!--
-  register.html — Version 2 (Hardened)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>Register</h1>
 
-  Build: same layout as v1_vulnerable/templates/register.html, plus:
-  - CSRF token field (matching login.html's approach).
-  - Client-side hints for password requirements (length/complexity),
-    mirrored by server-side validation in app.py — never trust the
-    client-side check alone.
-  - Link static/style.css.
--->
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <!-- FIX: hidden CSRF token, verified server-side in app.py. -->
+        <form method="POST" action="{{ url_for('register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required minlength="3">
+
+            <!-- Client-side hint only — app.py enforces the real
+                 minimum length server-side, since client checks are
+                 never trustworthy on their own. -->
+            <label for="password">Password (min. 8 characters)</label>
+            <input type="password" id="password" name="password" required minlength="8">
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p class="links"><a href="{{ url_for('login') }}">Back to login</a></p>
+    </div>
+</body>
+</html>
